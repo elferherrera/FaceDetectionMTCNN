@@ -1,0 +1,2 @@
+include README.rst
+include src/face_detection_mtcnn/models/**
