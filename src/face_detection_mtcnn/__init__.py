@@ -30,7 +30,7 @@ O_NET = O_NET.eval()
 # Ratio factor used by the detections
 FACTOR = 0.709
 
-def detect_face(imgs, minsize=20, threshold=[0.6, 0.7, 0.7]):
+def detect_face(imgs, minsize=20, threshold=(0.6, 0.7, 0.7)):
     """
     Face detection function
     Given an image or an array of images with the same size
