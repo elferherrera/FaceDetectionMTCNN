@@ -3,6 +3,7 @@ MTCNN networks definitions for face detections
 """
 
 import os
+from typing import Tuple
 
 import torch
 from torch import nn
@@ -14,7 +15,7 @@ class PNet(nn.Module):
         pretrained {bool} -- Whether or not to load saved pretrained weights (default: {True})
     """
 
-    def __init__(self, pretrained=True):
+    def __init__(self, pretrained: bool = True):
         super().__init__()
 
         self.conv1 = nn.Conv2d(3, 10, kernel_size=3)
@@ -38,7 +39,7 @@ class PNet(nn.Module):
             state_dict = torch.load(state_dict_path)
             self.load_state_dict(state_dict)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         x = self.conv1(x)
         x = self.prelu1(x)
         x = self.pool1(x)
@@ -62,7 +63,7 @@ class RNet(nn.Module):
         pretrained {bool} -- Whether or not to load saved pretrained weights (default: {True})
     """
 
-    def __init__(self, pretrained=True):
+    def __init__(self, pretrained: bool = True):
         super().__init__()
 
         self.conv1 = nn.Conv2d(3, 28, kernel_size=3)
@@ -90,7 +91,7 @@ class RNet(nn.Module):
             state_dict = torch.load(state_dict_path)
             self.load_state_dict(state_dict)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         x = self.conv1(x)
         x = self.prelu1(x)
         x = self.pool1(x)
@@ -119,7 +120,7 @@ class ONet(nn.Module):
         pretrained {bool} -- Whether or not to load saved pretrained weights (default: {True})
     """
 
-    def __init__(self, pretrained=True):
+    def __init__(self, pretrained: bool = True):
         super().__init__()
 
         self.conv1 = nn.Conv2d(3, 32, kernel_size=3)
@@ -152,7 +153,7 @@ class ONet(nn.Module):
             state_dict = torch.load(state_dict_path)
             self.load_state_dict(state_dict)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         x = self.conv1(x)
         x = self.prelu1(x)
         x = self.pool1(x)

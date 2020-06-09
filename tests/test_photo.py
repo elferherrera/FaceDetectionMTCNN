@@ -19,7 +19,7 @@ with open("tests/test_image.npy", "rb") as f:
 FACES_IN_IMAGE = 18
 
 
-def convert_color_channels(image):
+def convert_color_channels(image: np.ndarray) -> np.ndarray:
     """
     Convert image channels from BGR to RGB
     """
@@ -41,16 +41,15 @@ def test_number_detections():
     image_rgb = convert_color_channels(TEST_IMAGE)
     boxes, probs, faces = face_detection_mtcnn.detect_face(image_rgb)
 
-    assert len(boxes) == FACES_IN_IMAGE
-    assert len(probs) == FACES_IN_IMAGE
-    assert len(faces) == FACES_IN_IMAGE
+    assert len(boxes[0]) == FACES_IN_IMAGE
+    assert len(probs[0]) == FACES_IN_IMAGE
+    assert len(faces[0]) == FACES_IN_IMAGE
 
 
 def test_shape_one_image():
     """
     Test to check if dimensions when using one image are
-    correct. The detect face should remove one dimension
-    when only working with one image
+    correct
     """
 
     image_rgb = convert_color_channels(TEST_IMAGE)
@@ -62,16 +61,16 @@ def test_shape_one_image():
 
     # There should be 18 faces with 4 points marking the
     # bounding box for the face
-    assert boxes_shape == (18, 4)
+    assert boxes_shape == (1, 18, 4)
 
     # There should be 18 probs to indicate the probability
     # of each bounding box to belong to a face
-    assert probs_shape == (18,  )
+    assert probs_shape == (1, 18)
 
     # There should be 18 faces with 5 points. Each point should
     # have to values that represent the location of the 5 landmarks
     # in the face
-    assert faces_shape == (18, 5, 2)
+    assert faces_shape == (1, 18, 5, 2)
 
 
 def test_shape_list_images():

@@ -4,8 +4,9 @@ It loads the networks used for face detections and returns
 the bounding boxes for the detected faces
 """
 
-import numpy as np
+from typing import Tuple, List
 
+import numpy as np
 import torch
 from torch.nn.functional import interpolate
 from torchvision.ops.boxes import batched_nms
@@ -13,24 +14,21 @@ from torchvision.ops.boxes import batched_nms
 # Importing Neural networks weights
 from face_detection_mtcnn.models.mtcnn import PNet, ONet, RNet
 
-# Loading partial MTCNN networks
-P_NET = PNet(pretrained=True)
-R_NET = RNet(pretrained=True)
-O_NET = ONet(pretrained=True)
-
 # Selecting the available device for calculations
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Seting the networks to eval mode and not training
-# This avoids auto grad from being calculated
-P_NET = P_NET.eval()
-R_NET = R_NET.eval()
-O_NET = O_NET.eval()
+# Loading partial MTCNN networks
+P_NET = PNet(pretrained=True).eval().to(DEVICE)
+R_NET = RNet(pretrained=True).eval().to(DEVICE)
+O_NET = ONet(pretrained=True).eval().to(DEVICE)
 
 # Ratio factor used by the detections
 FACTOR = 0.709
 
-def detect_face(imgs, minsize=20, threshold=(0.6, 0.7, 0.7)):
+def detect_face(imgs,
+                minsize: int = 20,
+                threshold: Tuple[float, float, float] = (0.6, 0.7, 0.7)) -> \
+                Tuple[List[List[List[int]]], List[List[List[int]]], List[List[List[int]]]]:
     """
     Face detection function
     Given an image or an array of images with the same size
@@ -44,9 +42,17 @@ def detect_face(imgs, minsize=20, threshold=(0.6, 0.7, 0.7)):
         threshold: thresholds for the neural networks
 
     output:
-        boxes: bounding boxes where faces where found
-        probs: probabilities that the found face is a face
-        points: points that represent a face
+        boxes: bounding boxes where faces where found (4 values per face)
+        probs: probabilities that the found face is a face (1 value per face)
+        points: points that represent a face (5 pair of values per face)
+
+    Note: The ouput for the boxes will always be a list that corresponds to the
+    number of images used as input. Meaning that if just one image is used, the
+    size of the output will be (1, N, 4) where N is the number of faces. If the
+    number of images is S then the output will be (S, N, 4). There are 4
+    columns because there are 4 points that define a bounding box. Keep this in
+    mind when trying to access the list of faces detected
+
     """
 
     if isinstance(imgs, (np.ndarray, torch.Tensor)):
@@ -222,34 +228,11 @@ def detect_face(imgs, minsize=20, threshold=(0.6, 0.7, 0.7)):
 
     boxes, probs, points = [], [], []
     for box, point in zip(batch_boxes, batch_points):
-        box = np.array(box)
-        point = np.array(point)
 
-        if len(box) == 0:
-            boxes.append(None)
-            probs.append([None])
-            points.append(None)
-
-        else:
-            boxes.append(box[:, :4])
-            probs.append(box[:, 4])
-            points.append(point)
-
-    boxes = np.array(boxes)
-    probs = np.array(probs)
-    points = np.array(points)
-
-    # Reducing dimensions of tensor when only one image was used
-    if boxes.shape[0] == 1:
-        boxes = boxes[0]
-        probs = probs[0]
-        points = points[0]
-
-    # Changing arrays to lists and integers for easier manipulation
-    # when drawing and selecting areas
-    boxes = boxes.astype("int").tolist()
-    probs = probs.astype("float").tolist()
-    points = points.astype("int").tolist()
+        if len(box) != 0:
+            boxes.append(box[:, :4].astype("int").tolist())
+            probs.append(box[:, 4].astype("float").tolist())
+            points.append(point.astype("int").tolist())
 
     return boxes, probs, points
 
