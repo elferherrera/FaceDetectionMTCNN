@@ -31,7 +31,7 @@ setup(
     keywords="",
     url="",
     author="Fernando Herrera",
-    author_email="fernandoj.herrera@softtek.com",
+    author_email="fernando.j.herrera@gmail.com",
     license="MIT",
 
     python_requires=">=3.7",
