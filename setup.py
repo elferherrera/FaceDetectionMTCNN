@@ -41,7 +41,7 @@ setup(
         "pytest==5.1.1",
         "pytest-cov==2.9.0",
         "numpy==1.17.4",
-        "torch==1.5.0",
+        "torch==2.2.0",
         "torchvision==0.6.0",
     ],
 
